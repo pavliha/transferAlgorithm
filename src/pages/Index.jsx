@@ -1,6 +1,24 @@
 import React, {Component} from 'react'
-import GooglePlaceFinder from "../modules/GooglePlaceFinder";
+import CargoFinder from "../modules/CargoFinder"
 
+const routes = [
+    {
+        origin: {lat: 47.178526, lng: 35.111407},
+        destination: {lat: 47.789085, lng: 35.211338}
+    }, {
+        origin: {lat: 47.268105, lng: 35.222356},
+        destination: {lat: 47.788083, lng: 35.291438}
+    }, {
+        origin: {lat: 47.268105, lng: 35.222356},
+        destination: {lat: 47.784185, lng: 35.612418}
+    }, {
+        origin: {lat: 47.268105, lng: 35.222356},
+        destination: {lat: 47.781095, lng: 35.110498}
+    }, {
+        origin: {lat: 47.231606, lng: 35.401359},
+        destination: {lat: 47.338033, lng: 35.069088}
+    }
+]
 export default class Index extends Component {
 
 
@@ -13,25 +31,24 @@ export default class Index extends Component {
         name: "",
     }
 
-    googlePlaceFinder = null;
+    cargoFinder = null;
 
     componentDidMount() {
 
         google.maps.event.addDomListener(window, 'load', () => {
-            this.googlePlaceFinder = new GooglePlaceFinder(document.querySelector("#map"))
+            this.cargoFinder = new CargoFinder(document.querySelector("#map"),routes)
         });
     }
 
     route() {
 
-        this.googlePlaceFinder.clearBoxes()
 
-
-        this.googlePlaceFinder.setDirection({
+        this.cargoFinder.find({
             origin: this.state.from,
             destination: this.state.to,
-            //distance: this.state.distance
-        }, )
+            distance: 3,
+        })
+
 
     }
 
