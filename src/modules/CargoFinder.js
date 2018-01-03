@@ -1,6 +1,5 @@
 import StartMarker from "./Marker/StartMarker"
 import StopMarker from "./Marker/StopMarker"
-import BoxGenerator from "./Boxer/BoxGenerator"
 import BoxDrawer from "./Boxer/BoxDrawer"
 
 import {
@@ -92,19 +91,16 @@ export default class CargoFinder {
         this.deleteMarkers()
 
         const distance = request.distance
+
         delete request.distance
-        const direction = await
-            this.setDriveDirection(request)
 
-        this.findCargoNearDirection(direction, distance)
-    }
+        const direction = await this.setDriveDirection(request)
 
-    findCargoNearDirection(direction, distance) {
-        const boxGenerator = new BoxGenerator(direction, distance)
-        const boxes = boxGenerator.generate()
-        this.boxDrawer.draw(boxes)
+        const boxes = this.boxDrawer.draw(direction, distance)
+
         this.searchSimilarRoutesRecursive(boxes, 0)
     }
+
 
 
     getRandomMarkerPosition(bounds = this.map.getBounds()) {

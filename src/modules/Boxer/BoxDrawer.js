@@ -1,8 +1,12 @@
+import BoxGenerator from "./BoxGenerator";
+
 export default class BoxDrawer {
 
     constructor(map) {
         this.map = map
         this.boxpolys = null;
+
+
     }
 
     clear() {
@@ -14,7 +18,15 @@ export default class BoxDrawer {
         this.boxpolys = null
     }
 
-    draw(boxes) {
+    _generateBoxes(direciton, distance) {
+        this.boxGenerator = new BoxGenerator(direciton, distance)
+        return this.boxGenerator.generate()
+    }
+
+    draw(direction, distance) {
+
+        const boxes = this._generateBoxes(direction, distance)
+
         this.boxpolys = new Array(boxes.length)
         for (let i = 0; i < boxes.length; i++) {
             this.boxpolys[i] = new window.google.maps.Rectangle({
@@ -26,5 +38,7 @@ export default class BoxDrawer {
                 map: this.map
             })
         }
+
+        return boxes
     }
 }
