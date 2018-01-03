@@ -76,10 +76,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/index.html',
         }),
-        new CopyWebpackPlugin([{
-            from: './src/assets',
-            to: './assets',
-        }]),
+
         new webpack.ProvidePlugin({
             SmoothScroll: 'smoothscroll-polyfill',
             $: 'jquery',

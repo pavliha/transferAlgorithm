@@ -23,7 +23,7 @@ export default class Index extends Component {
 
 
     state = {
-        distance: 3,
+        distance: 10,
         from: "Tymoshivka, Zaporiz'ka oblast, 72030",
         to: "112B, Kosmichna St, 112Б, Zaporizhzhia, Zaporiz'ka oblast, 69000",
         type: "gas_station",
@@ -46,7 +46,7 @@ export default class Index extends Component {
         this.cargoFinder.find({
             origin: this.state.from,
             destination: this.state.to,
-            distance: 3,
+            distance: this.state.distance,
         })
 
 

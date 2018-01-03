@@ -4,13 +4,7 @@ import BoxGenerator from "./Boxer/BoxGenerator"
 import BoxDrawer from "./Boxer/BoxDrawer"
 
 import {
-    DirectionsRenderer,
-    DirectionsService,
-    DirectionsStatus,
-    DirectionsTravelMode,
-    InfoWindow,
-    LatLng,
-    MapTypeId,
+    DirectionsRenderer, DirectionsService, DirectionsStatus, DirectionsTravelMode, InfoWindow, LatLng, MapTypeId,
     places
 } from '../api/googleMaps'
 
@@ -35,25 +29,37 @@ export default class CargoFinder {
         this.directionsRenderer = new google.maps.DirectionsRenderer({
             map: this.map
         })
-
+        this.originMarkers = []
+        this.destinationMarkers = []
         this.boxDrawer = new BoxDrawer(this.map)
     }
 
-    routeInBox(route,box) {
-        return box.contains(route.origin) && box.contains(route.destination)
+    routeInBox(route, box) {
+
+        const result = box.contains(route.origin) && box.contains(route.destination)
+        console.log(box.contains(route.origin), box.contains(route.destination))
+        return result
     }
 
-    searchSimilarRoutesRecursive(boxes, searchIndex) {
-        for (const route of this.routes) {
-            if (this.routeInBox(route, boxes[searchIndex])) {
-                new StartMarker(route.origin)
-                new StopMarker(route.destination)
-            }
-        }
+    deleteMarkers() {
+        for (const originMarker of this.originMarkers)
+            originMarker.destroy()
 
-        searchIndex++
-        if (searchIndex < boxes.length)
-            this.searchSimilarRoutesRecursive(boxes, searchIndex)
+        for (const destinationMarker of this.destinationMarkers)
+            destinationMarker.destroy()
+    }
+
+
+    searchSimilarRoutesRecursive(boxes, i) {
+        for (const route of this.routes)
+            if (this.routeInBox(route, boxes[i])) {
+                this.originMarkers.push(new StartMarker(this.map, route.origin))
+                this.destinationMarkers.push(new StopMarker(this.map, route.destination))
+            }
+
+        i++
+
+        if (i < boxes.length) this.searchSimilarRoutesRecursive(boxes, i)
 
     }
 
@@ -83,9 +89,12 @@ export default class CargoFinder {
 
         this.boxDrawer.clear()
 
+        this.deleteMarkers()
+
         const distance = request.distance
         delete request.distance
-        const direction = await this.setDriveDirection(request)
+        const direction = await
+            this.setDriveDirection(request)
 
         this.findCargoNearDirection(direction, distance)
     }
