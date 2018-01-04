@@ -31,14 +31,10 @@ export default class CargoFinder {
         this.originMarkers = []
         this.destinationMarkers = []
         this.boxDrawer = new BoxDrawer(this.map)
+
+        this.waypoints = []
     }
 
-    routeInBox(route, box) {
-
-        const result = box.contains(route.origin) && box.contains(route.destination)
-        console.log(box.contains(route.origin), box.contains(route.destination))
-        return result
-    }
 
     deleteMarkers() {
         for (const originMarker of this.originMarkers)
@@ -51,7 +47,7 @@ export default class CargoFinder {
 
     searchSimilarRoutesRecursive(boxes, i) {
         for (const route of this.routes)
-            if (this.routeInBox(route, boxes[i])) {
+            if (boxes[i].contains(route.origin) && boxes[i].contains(route.destination)) {
                 this.originMarkers.push(new StartMarker(this.map, route.origin))
                 this.destinationMarkers.push(new StopMarker(this.map, route.destination))
             }
@@ -67,8 +63,11 @@ export default class CargoFinder {
 
         request = {
             ...request,
+            waypoints: this.waypoints,
+            optimizeWaypoints: true,
             travelMode: "DRIVING"
         }
+        console.log(request)
         return new Promise((resolve, reject) => {
             this.directionService.route(request, (result, status) => {
                 if (status === "OK") {
@@ -85,7 +84,7 @@ export default class CargoFinder {
     }
 
     async find(request) {
-
+        console.log("new route")
         this.boxDrawer.clear()
 
         this.deleteMarkers()
@@ -98,18 +97,38 @@ export default class CargoFinder {
 
         const boxes = this.boxDrawer.draw(direction, distance)
 
-        this.searchSimilarRoutesRecursive(boxes, 0)
+        for (const route of this.routes) {
+            if (this.isPointInBoxes(route.origin, boxes) && this.isPointInBoxes(route.destination, boxes)) {
+
+                const startMarker = new StartMarker(this.map, route.origin)
+                startMarker.onClick((e) => {
+                    this.waypoints.push({
+                        location: route.origin,
+                        stopover: true
+                    })
+                    this.waypoints.push({
+                        location: route.destination,
+                        stopover: true
+                    })
+
+                    this.setDriveDirection(request)
+                })
+                this.originMarkers.push(startMarker)
+
+                const stopMarker = new StopMarker(this.map, route.destination)
+                this.destinationMarkers.push(stopMarker)
+            }
+        }
     }
 
+    isPointInBoxes(point, boxes) {
+        let result = false
 
-
-    getRandomMarkerPosition(bounds = this.map.getBounds()) {
-        const lat_min = bounds.getSouthWest().lat(),
-            lat_range = bounds.getNorthEast().lat() - lat_min,
-            lng_min = bounds.getSouthWest().lng(),
-            lng_range = bounds.getNorthEast().lng() - lng_min;
-
-        return new google.maps.LatLng(lat_min + (Math.random() * lat_range),
-            lng_min + (Math.random() * lng_range));
+        for (const box of boxes) {
+            if (box.contains(point)) {
+                result = true
+            }
+        }
+        return result
     }
 }

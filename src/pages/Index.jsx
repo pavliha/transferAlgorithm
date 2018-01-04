@@ -7,7 +7,7 @@ const routes = [
         destination: {lat: 47.789085, lng: 35.211338}
     }, {
         origin: {lat: 47.268105, lng: 35.222356},
-        destination: {lat: 47.788083, lng: 35.291438}
+        destination: {lat: 47.798083, lng: 35.291438}
     }, {
         origin: {lat: 47.268105, lng: 35.222356},
         destination: {lat: 47.784185, lng: 35.612418}
